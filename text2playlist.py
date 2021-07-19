@@ -39,6 +39,7 @@ def graph_from_clean_string(clean_input, n=1):
     each word is a node
     connects start of a kgram with other kgrams
     where 1 <= k <= n
+    add extra node to make sure last word is processed
     """
     clean_words = clean_input.split()
     G = nx.Graph()
@@ -70,6 +71,8 @@ def find_song_on_spotify(clean_query_str, limit=50):
     returns list of URIs satisfying
     """
     uri_list = []
+    if clean_query_str == "":
+        return uri_list
     results = SPOTIFY_OBJ.search(q=clean_query_str, limit=limit)
     for song in results["tracks"]["items"]:
         clean_song_name = clean_string(song["name"])
