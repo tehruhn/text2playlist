@@ -97,8 +97,6 @@ def remove_kgrams_with_no_songs(G, clean_input_words, output=False):
         uris = find_song_on_spotify(word_string)
         if uris == [] :
             G.remove_edge(start, end)
-            if output:
-                print(word_string, "edge removed")
         else :
             uri_dict[edge] = uris
             if output:
@@ -112,10 +110,12 @@ def generate_playlist_from_text(input_str, n=4, output=False):
     """
     clean_input = clean_string(input_str)
     if output :
-        print("cleaned string")
+        print("cleaned string", clean_input)
     clean_words = clean_input.split()
     empty_graph = graph_from_clean_string(clean_input)
     kgram_graph = connect_kgrams(empty_graph, n=n)
+    if output:
+        print("graph has", len(clean_words), "nodes")
     if output :
         print("computed kgrams for all k")
     final_graph, uri_dict = \
@@ -130,6 +130,6 @@ def generate_playlist_from_text(input_str, n=4, output=False):
         paths.append(path)
     return paths
 
-test_str = "Bye guys thanks for everything"
+test_str = "pls send me chocolate"
 paths = generate_playlist_from_text(test_str, output=True)
 print(paths)
