@@ -165,6 +165,6 @@ def generate_playlist_from_text(input_str, n=4, output=False):
 
 
 if __name__ == "__main__":
-    test_str = "bye guys thanks for everything"
+    test_str = "505 plus 747 equals 1252"
     songs_dict = generate_playlist_from_text(test_str, output=True)
-# print(songs_dict)
+    # print(songs_dict)
