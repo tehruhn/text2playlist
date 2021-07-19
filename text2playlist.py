@@ -42,7 +42,7 @@ def graph_from_clean_string(clean_input, n=1):
     """
     clean_words = clean_input.split()
     G = nx.Graph()
-    G.add_nodes_from(range(len(clean_words)))
+    G.add_nodes_from(range(len(clean_words)+1))
     return G
 
 
@@ -76,8 +76,6 @@ def find_song_on_spotify(clean_query_str, limit=50):
         if clean_song_name == clean_query_str:
             uri_list.append(song["uri"])
     return uri_list
-
-# print(find_song_on_spotify("dont"))
 
 def remove_kgrams_with_no_songs(G, clean_input_words, output=False):
     """
@@ -114,15 +112,15 @@ def generate_playlist_from_text(input_str, n=4, output=False):
     clean_words = clean_input.split()
     empty_graph = graph_from_clean_string(clean_input)
     kgram_graph = connect_kgrams(empty_graph, n=n)
-    if output:
-        print("graph has", len(clean_words), "nodes")
-    if output :
-        print("computed kgrams for all k")
     final_graph, uri_dict = \
     remove_kgrams_with_no_songs(kgram_graph, clean_words, 
         output=output)
+    if output:
+        print("computed kgrams for all k")
+        print("graph has", len(clean_words)+1, "nodes")
+        print("graph edges", print(list(final_graph.edges())))
     source = 0
-    target = len(clean_words)-1
+    target = len(clean_words)
     all_paths_generator = \
         nx.all_simple_paths(final_graph, source, target)
     paths = []
