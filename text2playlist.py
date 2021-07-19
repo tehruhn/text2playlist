@@ -34,14 +34,17 @@ def clean_string(input_str):
     return clean_str
 
 
-def graph_from_clean_string(clean_input, n=1):
+def clean_words_from_string(input_str):
+    clean_input = clean_string(input_str)
+    return clean_input.split()
+
+def graph_from_clean_words(clean_words, n=1):
     """
     each word is a node
     connects start of a kgram with other kgrams
     where 1 <= k <= n
     add extra node to make sure last word is processed
     """
-    clean_words = clean_input.split()
     G = nx.Graph()
     G.add_nodes_from(range(len(clean_words)+1))
     return G
@@ -104,16 +107,34 @@ def remove_kgrams_with_no_songs(G, clean_input_words, output=False):
                 print(word_string, "song exists")
     return G, uri_dict
 
+def parse_path(word_list, path):
+    """
+    given a path as a list of integer indexes into
+    the word list
+    compute phrases that make up the complete song
+    """
+    if len(path) == 0:
+        return []
+    phrases = []
+    for idx in range(len(path)-1):
+        start = path[idx]
+        end = path[idx+1]
+        word_sublist = word_list[start:end]
+        word_string = " ".join(word_sublist)
+        phrases.append(word_string)
+    return phrases
+
+
 def generate_playlist_from_text(input_str, n=4, output=False):
     """
     will check upto 4grams
-    returns all_paths
+    returns all paths as LIST OF DICTS
+    where each dict is one path, and in a dict,
+    where key is phrase
+    and value is spotify uri
     """
-    clean_input = clean_string(input_str)
-    if output :
-        print("cleaned string", clean_input)
-    clean_words = clean_input.split()
-    empty_graph = graph_from_clean_string(clean_input)
+    clean_words = clean_words_from_string(input_str)
+    empty_graph = graph_from_clean_words(clean_words)
     kgram_graph = connect_kgrams(empty_graph, n=n)
     final_graph, uri_dict = \
     remove_kgrams_with_no_songs(kgram_graph, clean_words, 
@@ -126,12 +147,24 @@ def generate_playlist_from_text(input_str, n=4, output=False):
     target = len(clean_words)
     all_paths_generator = \
         nx.all_simple_paths(final_graph, source, target)
-    paths = []
+    word_paths = []
     for path in all_paths_generator:
-        paths.append(path)
-    if output:
-        print("final paths :", paths)
-    return paths
+        word_paths.append(parse_path(clean_words, path))
 
-test_str = "bye guys thanks for everything"
-generate_playlist_from_text(test_str, output=True)
+    word_path_dict_list = []
+    for word_path in word_paths:
+        word_path_dict = {}
+        for word in word_path:
+            word_path_dict[word] = uri_dict[word]
+        word_path_dict_list.append(word_path_dict)
+    if output:
+        print("final word paths :", word_paths)
+    return word_path_dict_list
+
+
+
+
+if __name__ == "__main__":
+    test_str = "bye guys thanks for everything"
+    songs_dict = generate_playlist_from_text(test_str, output=True)
+# print(songs_dict)
