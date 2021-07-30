@@ -132,6 +132,7 @@ def generate_playlist_from_text(input_str, n=4, output=False):
     where each dict is one path, and in a dict,
     where key is phrase
     and value is spotify uri
+    returns longest path currently
     """
     clean_words = clean_words_from_string(input_str)
     empty_graph = graph_from_clean_words(clean_words)
@@ -151,20 +152,19 @@ def generate_playlist_from_text(input_str, n=4, output=False):
     for path in all_paths_generator:
         word_paths.append(parse_path(clean_words, path))
 
-    word_path_dict_list = []
-    for word_path in word_paths:
-        word_path_dict = {}
-        for word in word_path:
-            word_path_dict[word] = uri_dict[word]
-        word_path_dict_list.append(word_path_dict)
-    if output:
-        print("final word paths :", word_paths)
-    return word_path_dict_list
+    # only return longest path
+    longest_path = max(word_paths, key = lambda i: len(i))
 
+    word_path_dict = {}
+    for word in longest_path:
+        word_path_dict[word] = uri_dict[word]
+    if output:
+        print("final longest word path :", longest_path)
+    return word_path_dict
 
 
 
 if __name__ == "__main__":
-    test_str = "505 plus 747 equals 1252"
+    test_str = "random shit"
     songs_dict = generate_playlist_from_text(test_str, output=True)
-    # print(songs_dict)
+    print(songs_dict)
