@@ -165,6 +165,7 @@ def generate_playlist_from_text(input_str, n=4, output=False, only_longest_path=
         nx.all_simple_paths(final_graph, source, target)
     word_paths = []
     for path in all_paths_generator:
+        print(type(path))
         word_paths.append(parse_path(clean_words, path))
 
     # check if path found
@@ -174,7 +175,18 @@ def generate_playlist_from_text(input_str, n=4, output=False, only_longest_path=
 
     # if path not found
     if not path_found :
-        pass
+        word_paths = []
+        connected_comps = nx.connected_components(final_graph)
+        for subset in connected_comps:
+            subset_list = [elem for elem in subset]
+            if len(subset) >= 2:
+                word_paths.append(parse_path(clean_words, subset))
+        word_path_dict = {}
+        for word in word_paths:
+            word_path_dict[word] = uri_dict[word]
+        if output:
+            print("final longest word path :", longest_path)
+        return path_found, word_path_dict
 
     # else if path found
     else:
