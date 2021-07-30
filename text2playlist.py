@@ -3,6 +3,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import os
 import networkx as nx
 
+
+
 def connect_to_spotify():
     client_id = os.environ.get('SPOTIFY_CLIENT_ID')
     secret = os.environ.get('SPOTIFY_CLIENT_SECRET')
@@ -15,7 +17,9 @@ def connect_to_spotify():
     return spotify_obj
 
 
+
 SPOTIFY_OBJ = connect_to_spotify()
+
 
 
 def clean_string(input_str):
@@ -34,9 +38,12 @@ def clean_string(input_str):
     return clean_str
 
 
+
 def clean_words_from_string(input_str):
     clean_input = clean_string(input_str)
     return clean_input.split()
+
+
 
 def graph_from_clean_words(clean_words, n=1):
     """
@@ -48,6 +55,7 @@ def graph_from_clean_words(clean_words, n=1):
     G = nx.Graph()
     G.add_nodes_from(range(len(clean_words)+1))
     return G
+
 
 
 def connect_kgrams(G, n=1):
@@ -69,6 +77,7 @@ def connect_kgrams(G, n=1):
     return G
 
 
+
 def find_song_on_spotify(clean_query_str, limit=50):
     """
     returns list of URIs satisfying
@@ -82,6 +91,8 @@ def find_song_on_spotify(clean_query_str, limit=50):
         if clean_song_name == clean_query_str:
             uri_list.append(song["uri"])
     return uri_list
+
+
 
 def remove_kgrams_with_no_songs(G, clean_input_words, output=False):
     """
@@ -107,6 +118,8 @@ def remove_kgrams_with_no_songs(G, clean_input_words, output=False):
                 print(word_string, "song exists")
     return G, uri_dict
 
+
+
 def parse_path(word_list, path):
     """
     given a path as a list of integer indexes into
@@ -123,6 +136,7 @@ def parse_path(word_list, path):
         word_string = " ".join(word_sublist)
         phrases.append(word_string)
     return phrases
+
 
 
 def generate_playlist_from_text(input_str, n=4, output=False, only_longest_path=True):
@@ -172,6 +186,7 @@ def generate_playlist_from_text(input_str, n=4, output=False, only_longest_path=
         if output:
             print("all final word paths :", word_paths)
         return word_path_dict_list
+
 
 
 if __name__ == "__main__":
