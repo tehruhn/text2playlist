@@ -138,8 +138,33 @@ def parse_path(word_list, path):
     return phrases
 
 
+def find_all_paths_in_graphs(graph, source, target, clean_words):
+    """
+    Generate all paths from source to target in graph
+    """
+    all_paths_generator = \
+        nx.all_simple_paths(graph, source, target)
+    word_paths = []
+    for path in all_paths_generator:
+        word_paths.append(parse_path(clean_words, path))
+    return word_paths
 
-def generate_playlist_from_text(input_str, n=4, output=False, only_longest_path=True):
+
+def find_connected_components(graph, clean_words):
+    """
+    Returns connected components with nodes as list of lists
+    """
+    connected_comps = nx.connected_components(graph)
+    word_paths = []
+    for node_set in connected_comps:
+        subgraph = graph.subgraph(node_set)
+        nodes = list(subgraph.nodes())
+        word_paths.append(parse_path(clean_words, nodes))
+    return word_paths
+
+
+
+def generate_playlist_from_text(input_str, n=4, output=False):
     """
     will check upto 4grams
     returns all paths as LIST OF DICTS
@@ -159,14 +184,11 @@ def generate_playlist_from_text(input_str, n=4, output=False, only_longest_path=
         print("computed kgrams for all k")
         print("graph has", len(clean_words)+1, "nodes")
         print("graph edges", list(final_graph.edges()))
-    source = 0
-    target = len(clean_words)
-    all_paths_generator = \
-        nx.all_simple_paths(final_graph, source, target)
-    word_paths = []
-    for path in all_paths_generator:
-        print(type(path))
-        word_paths.append(parse_path(clean_words, path))
+
+    # find all paths from first node to last node
+    # first node is 0, last node is len(cleanwords)
+    word_paths = find_all_paths_in_graphs(final_graph, 0,
+        len(clean_words), clean_words)
 
     # check if path found
     path_found = False
@@ -175,17 +197,14 @@ def generate_playlist_from_text(input_str, n=4, output=False, only_longest_path=
 
     # if path not found
     if not path_found :
-        word_paths = []
-        connected_comps = nx.connected_components(final_graph)
-        for subset in connected_comps:
-            subset_list = [elem for elem in subset]
-            if len(subset) >= 2:
-                word_paths.append(parse_path(clean_words, subset))
+        word_paths = find_connected_components(final_graph, clean_words)
         word_path_dict = {}
         for word in word_paths:
-            word_path_dict[word] = uri_dict[word]
+            if word != []:
+                word_str = word[0]
+                word_path_dict[word_str] = uri_dict[word_str]
         if output:
-            print("final longest word path :", longest_path)
+            print("best possible word path :", word_paths)
         return path_found, word_path_dict
 
     # else if path found
