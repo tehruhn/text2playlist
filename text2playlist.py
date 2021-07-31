@@ -160,11 +160,12 @@ def find_connected_components(graph, clean_words):
         subgraph = graph.subgraph(node_set)
         nodes = list(subgraph.nodes())
         word_paths.append(parse_path(clean_words, nodes))
+    print(word_paths)
     return word_paths
 
 
 
-def generate_playlist_from_text(input_str, n=4, output=False):
+def generate_playlist_from_text(input_str, n=4, output=False, only_longest_path=True):
     """
     will check upto 4grams
     returns all paths as LIST OF DICTS
@@ -233,6 +234,6 @@ def generate_playlist_from_text(input_str, n=4, output=False):
 
 
 if __name__ == "__main__":
-    test_str = "let there be smg"
+    test_str = "haha lol one last rick roll"
     songs_dict = generate_playlist_from_text(test_str, output=True)
-    # print(songs_dict)
+    print(songs_dict)
